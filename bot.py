@@ -1,3 +1,12 @@
+import discord
+
+token = ""
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print('Logged on as {0}!'.format(self.user))
+
+    async def on_message(self, message):
+        print('Message from {0.author}: {0.content}'.format(message))
 number_of_pods=input("how many pods")
 number_of_pods=int(number_of_pods)
 players = []
