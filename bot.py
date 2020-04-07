@@ -241,7 +241,6 @@ elif number_of_pods==3:
 else:
     print("error")
 
-print(players)
-print(players_pod1)
-print(players_pod2)
-print(players_pod3)
+client = MyClient()
+
+client.run(token)
