@@ -3,9 +3,10 @@ from discord.ext import commands
 import random
 import math
 import operator
-import numpy as np
+import json
+from collections import Counter
 
-token = "Njk2NTUyMDE1MjU3NjY1NTQ3.XoyPlg.BUAxIlfrQbIO57nEBK6L4mP2nbM"
+token = "Njk2NTUyMDE1MjU3NjY1NTQ3.XozjZQ.98EpSLsSfmIyzeQ22jrre_eVulY"
 bot = commands.Bot(command_prefix='*', activity=discord.Game(name="Prefix is *"))
 
 bot.player = []
@@ -18,6 +19,10 @@ bot.players_pod3_score = [0, 0, 0, 0, 0, 0, 0, 0]
 bot.playersdictpod1 = {}
 bot.playersdictpod2 = {}
 bot.playersdictpod3 = {}
+bot.leaderboardpod1 = {}
+bot.leaderboardpod2 = {}
+bot.leaderboardpod3 = {}
+bot.leaderboard = {}
 
 
 @bot.event
@@ -118,20 +123,21 @@ async def results(ctx, pod):
         for player in bot.players_pod1:
             bot.playersdictpod1[player] = bot.players_pod1_score[a]
             a += 1
-        sorted_playerdictpod1 = dict(sorted(bot.playersdictpod1.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(sorted_playerdictpod1)
+        bot.sorted_playerdictpod1 = dict(sorted(bot.playersdictpod1.items(), key=operator.itemgetter(1), reverse=True))
+        await ctx.send(bot.sorted_playerdictpod1)
     if pod == 2:
         for player in bot.players_pod2:
             bot.playersdictpod2[player] = bot.players_pod2_score[a]
             a += 1
-        sorted_playerdictpod2 = dict(sorted(bot.playersdictpod2.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(sorted_playerdictpod2)
+        bot.sorted_playerdictpod2 = dict(sorted(bot.playersdictpod2.items(), key=operator.itemgetter(1), reverse=True))
+        await ctx.send(bot.sorted_playerdictpod2)
     if pod == 3:
         for player in bot.players_pod3:
             bot.playersdictpod3[player] = bot.players_pod3_score[a]
             a += 1
-        sorted_playerdictpod3 = dict(sorted(bot.playersdictpod3.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(sorted_playerdictpod3)
+        bot.sorted_playerdictpod3 = dict(sorted(bot.playersdictpod3.items(), key=operator.itemgetter(1), reverse=True))
+        await ctx.send(bot.sorted_playerdictpod3)
+
 
 @bot.command()
 async def endtourney(ctx):
@@ -141,9 +147,47 @@ async def endtourney(ctx):
     bot.players_pod3 = []
     await ctx.send("Success!")
 
+
 @bot.command()
-async def updateleaderboard(ctx):
-    leaderboard = np.asarray([[0, 1], [4, 5]])
-    np.savetext("leaderboard.csv", leaderboard, delimeter=',')
+async def generateleaderboard(ctx, pod):
+    if int(pod) == 1:
+        bot.leaderboardpod1 = "Leaderboard For Event\n-----------------------------\n"
+        for i in bot.sorted_playerdict_pod1:
+            bot.leaderboardpod1.join(i + "  ---  " + bot.sorted_playerdict_pod1[i] + "\n")
+        await ctx.send(bot.leaderboardpod1)
+    elif int(pod) == 2:
+        bot.leaderboardpod2 = "Leaderboard For Event\n-----------------------------\n"
+        for i in bot.sorted_playerdict_pod2:
+            bot.leaderboardpod2.join(i + "  ---  " + bot.sorted_playerdict_pod2[i])
+        await ctx.send(bot.leaderboardpod2)
+    elif int(pod) == 3:
+        bot.leaderboardpod3 = "Leaderboard For Event\n-----------------------------\n"
+        for i in bot.sorted_playerdict_pod3:
+            bot.leaderboardpod3.join(i + "  ---  " + bot.sorted_playerdict_pod3[i])
+        await ctx.send(bot.leaderboardpod3)
+
+@bot.command()
+async def updateleaderboard(ctx, pod):
+    with open('leaderboard.json', 'r') as fp:
+        oldleaderboard = json.load(fp)
+        A = Counter(oldleaderboard)
+        B = Counter(bot.leaderboardpod1)
+        C = Counter(bot.leaderboardpod2)
+        d = Counter(bot.leaderboardpod3)
+        newleaderboard = A + B + C + D
+        leaderboarddisplay = "Leaderboard For Event\n-----------------------------\n"
+        for key in newleaderboard:
+            leaderboarddisplay = leaderboarddisplay + str(key) + "  ---  " + str(newleaderboard[key]) + "\n"
+        await ctx.send(leaderboarddisplay)
+    with open('leaderboard.json', 'w') as fp:
+        json.dump(newleaderboard, fp)
+
+    bot.leaderboarddisplay = "Leaderboard For Event\n-----------------------------\n"
+    for i in bot.leaderboard:
+        bot.leaderboarddisplay.join(str(i) + "  ---  " + str(bot.leaderboard[i] + "\n"))
+    await ctx.send(bot.leaderboarddisplay)
+
+    with open('leaderboard.json', 'w') as fp:
+        json.dump(bot.leaderboard, fp)
 
 bot.run(token)

@@ -1,30 +1,26 @@
-a = 0
-b = 0
-players_pod1 = ["a", "b", "c", "d", "e", "f", "g", "h"]
-players_pod1_score = [1, 2, 0, 1, 2, 3, 1, 2]
-while a < 7:
-    print(a)
-    while b < 7:
-        print(b)
-        if players_pod1_score[a] > players_pod1_score[b]:
-            players_pod1_buffer = players_pod1[a]
-            players_pod1_score_buffer = players_pod1_score[a]
-            players_pod1[a] = players_pod1[b]
-            players_pod1_score[a] = players_pod1_score[b]
-            players_pod1[b] = players_pod1_buffer
-            players_pod1_score[b] = players_pod1_score_buffer
-        elif players_pod1_score[a] < players_pod1_score[b]:
-            players_pod1_buffer = players_pod1[b]
-            players_pod1_score_buffer = players_pod1_score[b]
-            players_pod1[b] = players_pod1[a]
-            players_pod1_score[b] = players_pod1_score[a]
-            players_pod1[a] = players_pod1_buffer
-            players_pod1_score[a] = players_pod1_score_buffer
-        b += 1
-    a += 1
+import json
+from collections import Counter
+leaderboardpod1 = {
+        "a": 3,
+        "b": 6,
+        "c": 12,
+        "d": 9,
+        "e": 9,
+        "f": 6,
+        "g": 3,
+        "h": 0,
+    }
 
 
+with open('leaderboard.json', 'r') as fp:
+    oldleaderboard = json.load(fp)
+    A = Counter(oldleaderboard)
+    B = Counter(leaderboardpod1)
+    newleaderboard = A + B
 
-"""for i in players_pod1:
-    print(str(players_pod1[a]) + " " + str(players_pod1_score[a]))
-    a += 1"""
+    leaderboarddisplay = "Leaderboard For Event\n-----------------------------\n"
+    for key in newleaderboard:
+        leaderboarddisplay = leaderboarddisplay + str(key) + "  ---  " + str(newleaderboard[key]) + "\n"
+    await ctx.send(leaderboarddisplay)
+with open('leaderboard.json', 'w') as fp:
+    json.dump(newleaderboard, fp)
