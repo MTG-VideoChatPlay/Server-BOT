@@ -7,7 +7,7 @@ import json
 from collections import Counter
 import asyncio
 
-token = ""
+token = "Njk2NTUyMDE1MjU3NjY1NTQ3.Xo6WTQ.MDzN2d8fbDPvk1BMwrL4z5PvHwA"
 bot = commands.Bot(command_prefix='*', activity=discord.Game(name="Prefix is *"))
 
 bot.player = []
@@ -65,15 +65,15 @@ async def generatetables(ctx, pod=1):
     if int(pod) == 1:
         for i in range(0, int(len(bot.playerspod1)/2)):
             tables_pod1[i-1] = list(bot.playerspod1.keys())[i*2-2] + " - " + list(bot.playerspod1.keys())[i*2-1]
-        await ctx.send("Your tables for pod 1 are:\n" + tables_pod1[0] + "\n" + tables_pod1[1] + "\n" + tables_pod1[2] + "\n" + tables_pod1[3] + "\n")
+        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod1[0]) + "\n" + str(tables_pod1[1]) + "\n" + str(tables_pod1[2]) + "\n" + str(tables_pod1[3]) + "\n")
     if int(pod) == 2:
         for i in range(0, int(len(bot.playerspod2)/2)):
             tables_pod2[i-1] = list(bot.playerspod2.keys())[i*2-2] + " - " + list(bot.playerspod2.keys())[i*2-1]
-        await ctx.send("Your tables for pod 1 are:\n" + tables_pod2[0] + "\n" + tables_pod2[1] + "\n" + tables_pod2[2] + "\n" + tables_pod2[3] + "\n")
+        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod2[0]) + "\n" + str(tables_pod2[1]) + "\n" + str(tables_pod2[2]) + "\n" + str(tables_pod2[3]) + "\n")
     if int(pod) == 3:
         for i in range(0, int(len(bot.playerspod3)/2)):
             tables_pod3[i-1] = list(bot.playerspod3.keys())[i*2-2] + " - " + list(bot.playerspod3.keys())[i*2-1]
-        await ctx.send("Your tables for pod 1 are:\n" + tables_pod3[0] + "\n" + tables_pod3[1] + "\n" + tables_pod3[2] + "\n" + tables_pod3[3] + "\n")
+        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod3[0]) + "\n" + str(tables_pod3[1]) + "\n" + str(tables_pod3[2]) + "\n" + str(tables_pod3[3]) + "\n")
 
 
 # fix ties
@@ -81,27 +81,27 @@ async def generatetables(ctx, pod=1):
 async def gameover(ctx, pod, table, score):
     score.split("-")
     if int(pod) == 1:
-        if score[0] > score[1]:
+        if int(score[0]) > int(score[2]):
             bot.players_pod1_score[(int(table)*2)-2] = int(bot.players_pod1_score[(int(table)*2)-2]) + 3
-        elif score[0] < score[1]:
+        if int(score[0]) < int(score[2]):
             bot.players_pod1_score[(int(table)*2)-1] = int(bot.players_pod1_score[(int(table)*2)-1]) + 3
-        elif score[0] == score[1]:
+        if int(score[0]) == int(score[2]):
             bot.players_pod1_score[(int(table)*2)-2] = int(bot.players_pod1_score[(int(table)*2)-2]) + 1
             bot.players_pod1_score[(int(table)*2)-1] = int(bot.players_pod1_score[(int(table)*2)-1]) + 1
     if int(pod) == 2:
-        if score[0] > score[1]:
+        if int(score[0]) > int(score[2]):
             bot.players_pod2_score[(int(table)*2)-2] = int(bot.players_pod2_score[(int(table)*2)-2]) + 3
-        elif score[0] < score[1]:
+        if int(score[0]) < int(score[2]):
             bot.players_pod2_score[(int(table)*2)-1] = int(bot.players_pod2_score[(int(table)*2)-1]) + 3
-        elif score[0] == score[1]:
+        if int(score[0]) == int(score[2]):
             bot.players_pod2_score[(int(table)*2)-2] = int(bot.players_pod2_score[(int(table)*2)-2]) + 1
             bot.players_pod2_score[(int(table)*2)-1] = int(bot.players_pod2_score[(int(table)*2)-1]) + 1
     if int(pod) == 3:
-        if score[0] > score[1]:
+        if int(score[0]) > int(score[2]):
             bot.players_pod3_score[(int(table)*2)-2] = int(bot.players_pod3_score[(int(table)*2)-2]) + 3
-        elif score[0] < score[1]:
+        if int(score[0]) < int(score[2]):
             bot.players_pod3_score[(int(table)*2)-1] = int(bot.players_pod3_score[(int(table)*2)-1]) + 3
-        elif score[0] == score[1]:
+        if int(score[0]) == int(score[2]):
             bot.players_pod3_score[(int(table)*2)-2] = int(bot.players_pod3_score[(int(table)*2)-2]) + 1
             bot.players_pod3_score[(int(table)*2)-1] = int(bot.players_pod3_score[(int(table)*2)-1]) + 1
 
