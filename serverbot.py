@@ -7,7 +7,7 @@ import json
 from collections import Counter
 import asyncio
 
-token = "Njk2NTUyMDE1MjU3NjY1NTQ3.Xo6WTQ.MDzN2d8fbDPvk1BMwrL4z5PvHwA"
+token = ""
 bot = commands.Bot(command_prefix='*', activity=discord.Game(name="Prefix is *"))
 
 bot.player = []
@@ -27,7 +27,7 @@ bot.leaderboard = {}
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
 
-
+# Works PERFECTLY
 @bot.command()
 async def register(ctx, *person):
     bot.player = list(person)
@@ -127,6 +127,9 @@ async def results(ctx, pod=1):
             a += 1
         bot.sorted_playerspod3 = dict(sorted(bot.playerspod3.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.sorted_playerspod3)
+    bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
+    bot.players_pod2_score = [0, 0, 0, 0, 0, 0, 0, 0]
+    bot.players_pod3_score = [0, 0, 0, 0, 0, 0, 0, 0]
 
 
 @bot.command()
@@ -149,18 +152,18 @@ async def endtourney(ctx):
 async def generateleaderboard(ctx, pod):
     if int(pod) == 1:
         bot.leaderboardpod1 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_player_pod1:
-            bot.leaderboardpod1.join(i + "  ---  " + bot.sorted_player_pod1[i] + "\n")
+        for i in bot.sorted_playerspod1:
+            bot.leaderboardpod1.join(i + "  ---  " + str(bot.sorted_playerspod1[i]) + "\n")
         await ctx.send(bot.leaderboardpod1)
     elif int(pod) == 2:
         bot.leaderboardpod2 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_player_pod2:
-            bot.leaderboardpod2.join(i + "  ---  " + bot.sorted_player_pod2[i])
+        for i in bot.sorted_playerspod2:
+            bot.leaderboardpod2.join(i + "  ---  " + str(bot.sorted_playerspod2[i]))
         await ctx.send(bot.leaderboardpod2)
     elif int(pod) == 3:
         bot.leaderboardpod3 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_player_pod3:
-            bot.leaderboardpod3.join(i + "  ---  " + bot.sorted_player_pod3[i])
+        for i in bot.sorted_playerspod3:
+            bot.leaderboardpod3.join(i + "  ---  " + str(bot.sorted_playerspod3[i]))
         await ctx.send(bot.leaderboardpod3)
 
 @bot.command()
