@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 import discord
 from discord.ext import commands
 import random
@@ -55,7 +57,8 @@ async def generatepods(ctx, numberofpods=1):
     if len(bot.playerspod3) % 2 == 1:
         bot.playerspod3.update({"NO PLAY": 0})
 
-
+#fixed an indexing issue, now this function can be reused in further rounds. It will ensure all players are paired
+#with another player who has similar points.
 @bot.command()
 async def generatetables(ctx, pod=1):
     tables_pod1 = [0, 0, 0, 0]
@@ -63,17 +66,17 @@ async def generatetables(ctx, pod=1):
     tables_pod3 = [0, 0, 0, 0]
 
     if int(pod) == 1:
-        for i in range(0, int(len(bot.playerspod1)/2)):
-            tables_pod1[i-1] = list(bot.playerspod1.keys())[i*2-2] + " - " + list(bot.playerspod1.keys())[i*2-1]
+        for i in range(int(len(bot.playerspod1)/2)):
+            tables_pod1[i] = list(bot.playerspod1.keys())[2*i+1] + " - " + list(bot.playerspod1.keys())[2*i]
         await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod1[0]) + "\n" + str(tables_pod1[1]) + "\n" + str(tables_pod1[2]) + "\n" + str(tables_pod1[3]) + "\n")
     if int(pod) == 2:
-        for i in range(0, int(len(bot.playerspod2)/2)):
-            tables_pod2[i-1] = list(bot.playerspod2.keys())[i*2-2] + " - " + list(bot.playerspod2.keys())[i*2-1]
-        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod2[0]) + "\n" + str(tables_pod2[1]) + "\n" + str(tables_pod2[2]) + "\n" + str(tables_pod2[3]) + "\n")
+        for i in range(int(len(bot.playerspod2)/2)):
+            tables_pod2[i] = list(bot.playerspod2.keys())[2*i+1] + " - " + list(bot.playerspod2.keys())[2*i]
+        await ctx.send("Your tables for pod 2 are:\n" + str(tables_pod2[0]) + "\n" + str(tables_pod2[1]) + "\n" + str(tables_pod2[2]) + "\n" + str(tables_pod2[3]) + "\n")
     if int(pod) == 3:
-        for i in range(0, int(len(bot.playerspod3)/2)):
-            tables_pod3[i-1] = list(bot.playerspod3.keys())[i*2-2] + " - " + list(bot.playerspod3.keys())[i*2-1]
-        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod3[0]) + "\n" + str(tables_pod3[1]) + "\n" + str(tables_pod3[2]) + "\n" + str(tables_pod3[3]) + "\n")
+        for i in range(int(len(bot.playerspod3)/2)):
+            tables_pod3[i] = list(bot.playerspod3.keys())[2*i+1] + " - " + list(bot.playerspod3.keys())[2*i]
+        await ctx.send("Your tables for pod 3 are:\n" + str(tables_pod3[0]) + "\n" + str(tables_pod3[1]) + "\n" + str(tables_pod3[2]) + "\n" + str(tables_pod3[3]) + "\n")
 
 
 # fix ties
@@ -111,25 +114,22 @@ async def results(ctx, pod=1):
     a = 0
     if int(pod) == 1:
         for player in bot.playerspod1:
-            bot.playerspod1[player] = bot.players_pod1_score[a] + bot.playerspod1[player]
+            bot.playerspod1[player] += bot.players_pod1_score[a]
             a += 1
-        bot.sorted_playerspod1 = dict(sorted(bot.playerspod1.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(bot.sorted_playerspod1)
+        bot.playerspod1 = dict(sorted(bot.playerspod1.items(), key=operator.itemgetter(1), reverse=True))
+        await ctx.send(bot.playerspod1)
     if int(pod) == 2:
         for player in bot.playerspod2:
-            bot.playerspod2[player] = bot.players_pod2_score[a]
+            bot.playerspod2[player] += bot.players_pod2_score[a]
             a += 1
-        bot.sorted_playerspod2 = dict(sorted(bot.playerspod2.items(), key=operator.itemgetter(1), reverse=True))
+        bot.playerspod2 += dict(sorted(bot.playerspod2.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.sorted_playerspod2)
     if int(pod) == 3:
         for player in bot.playerspod3:
-            bot.playerspod3[player] = bot.players_pod3_score[a]
+            bot.playerspod3[player] += bot.players_pod3_score[a]
             a += 1
-        bot.sorted_playerspod3 = dict(sorted(bot.playerspod3.items(), key=operator.itemgetter(1), reverse=True))
+        bot.playerspod3 = dict(sorted(bot.playerspod3.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.sorted_playerspod3)
-    bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
-    bot.players_pod2_score = [0, 0, 0, 0, 0, 0, 0, 0]
-    bot.players_pod3_score = [0, 0, 0, 0, 0, 0, 0, 0]
 
 
 @bot.command()
@@ -152,18 +152,18 @@ async def endtourney(ctx):
 async def generateleaderboard(ctx, pod):
     if int(pod) == 1:
         bot.leaderboardpod1 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_playerspod1:
-            bot.leaderboardpod1.join(i + "  ---  " + str(bot.sorted_playerspod1[i]) + "\n")
+        for i in bot.playerspod1:
+            bot.leaderboardpod1 += str(i) + "  ---  " + str(bot.playerspod1[i]) + "\n"
         await ctx.send(bot.leaderboardpod1)
     elif int(pod) == 2:
         bot.leaderboardpod2 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_playerspod2:
-            bot.leaderboardpod2.join(i + "  ---  " + str(bot.sorted_playerspod2[i]))
+        for i in bot.playerspod2:
+            bot.leaderboardpod2 += str(i) + "  ---  " + str(bot.playerspod2[i])
         await ctx.send(bot.leaderboardpod2)
     elif int(pod) == 3:
         bot.leaderboardpod3 = "Leaderboard For Event\n-----------------------------\n"
-        for i in bot.sorted_playerspod3:
-            bot.leaderboardpod3.join(i + "  ---  " + str(bot.sorted_playerspod3[i]))
+        for i in bot.playerspod3:
+            bot.leaderboardpod3 += str(i) + "  ---  " + str(bot.playerspod3[i])
         await ctx.send(bot.leaderboardpod3)
 
 @bot.command()
