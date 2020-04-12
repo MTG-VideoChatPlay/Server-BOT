@@ -9,7 +9,7 @@ import json
 from collections import Counter
 import asyncio
 
-token = "Njk2NTUyMDE1MjU3NjY1NTQ3.Xo8lSQ.Jo4s0wnQcZHSNKNQphOjDQfbou4"
+token = ""
 bot = commands.Bot(command_prefix='*', activity=discord.Game(name="Prefix is *"))
 
 bot.player = []
@@ -136,14 +136,14 @@ async def results(ctx, pod=1):
             a += 1
         bot.playerspod2 += dict(sorted(bot.playerspod2.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.playerspod2)
-        bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
+        bot.players_pod2_score = [0, 0, 0, 0, 0, 0, 0, 0]
     if int(pod) == 3:
         for player in bot.playerspod3:
             bot.playerspod3[player] += bot.players_pod3_score[a]
             a += 1
         bot.playerspod3 = dict(sorted(bot.playerspod3.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.playerspod3)
-        bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
+        bot.players_pod3_score = [0, 0, 0, 0, 0, 0, 0, 0]
 
 
 @bot.command()
