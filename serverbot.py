@@ -9,7 +9,7 @@ import json
 from collections import Counter
 import asyncio
 
-token = ""
+token = "Njk2NTUyMDE1MjU3NjY1NTQ3.Xo8lSQ.Jo4s0wnQcZHSNKNQphOjDQfbou4"
 bot = commands.Bot(command_prefix='*', activity=discord.Game(name="Prefix is *"))
 
 bot.player = []
@@ -24,6 +24,10 @@ bot.leaderboardpod2 = {}
 bot.leaderboardpod3 = {}
 bot.leaderboard = {}
 
+def is_judge(ctx):
+    bot.has_role("admin")
+
+
 
 @bot.event
 async def on_ready():
@@ -37,6 +41,7 @@ async def register(ctx, *person):
 
 # WORKS PERFECTLY
 @bot.command()
+@commands.has_role('judge')
 async def generatepods(ctx, numberofpods=1):
     random.shuffle(bot.player)
     x = math.ceil(len(bot.player)/int(numberofpods))
@@ -60,56 +65,62 @@ async def generatepods(ctx, numberofpods=1):
 #fixed an indexing issue, now this function can be reused in further rounds. It will ensure all players are paired
 #with another player who has similar points.
 @bot.command()
+@commands.has_role('judge')
 async def generatetables(ctx, pod=1):
     tables_pod1 = [0, 0, 0, 0]
     tables_pod2 = [0, 0, 0, 0]
     tables_pod3 = [0, 0, 0, 0]
 
     if int(pod) == 1:
+        await ctx.send("Your tables for pod 1 are:")
         for i in range(int(len(bot.playerspod1)/2)):
-            tables_pod1[i] = list(bot.playerspod1.keys())[2*i+1] + " - " + list(bot.playerspod1.keys())[2*i]
-        await ctx.send("Your tables for pod 1 are:\n" + str(tables_pod1[0]) + "\n" + str(tables_pod1[1]) + "\n" + str(tables_pod1[2]) + "\n" + str(tables_pod1[3]) + "\n")
+            tables_pod1[i] = (list(bot.playerspod1.keys())[2*i], list(bot.playerspod1.keys())[2*i+1])
+            await ctx.send(f"\n{tables_pod1[i][0]} - {tables_pod1[i][1]}\n")
     if int(pod) == 2:
+        await ctx.send(f"Your tables for pod 2 are:")
         for i in range(int(len(bot.playerspod2)/2)):
-            tables_pod2[i] = list(bot.playerspod2.keys())[2*i+1] + " - " + list(bot.playerspod2.keys())[2*i]
-        await ctx.send("Your tables for pod 2 are:\n" + str(tables_pod2[0]) + "\n" + str(tables_pod2[1]) + "\n" + str(tables_pod2[2]) + "\n" + str(tables_pod2[3]) + "\n")
+            tables_pod2[i] = (list(bot.playerspod2.keys())[2*i], list(bot.playerspod2.keys())[2*+1])
+        await ctx.send(f"\n{tables_pod2[i][0]} - {tables_pod2[i][1]}\n")
     if int(pod) == 3:
         for i in range(int(len(bot.playerspod3)/2)):
-            tables_pod3[i] = list(bot.playerspod3.keys())[2*i+1] + " - " + list(bot.playerspod3.keys())[2*i]
+            tables_pod3[i] = list(bot.playerspod3.keys())[2*i] + " - " + list(bot.playerspod3.keys())[2*i+1]
         await ctx.send("Your tables for pod 3 are:\n" + str(tables_pod3[0]) + "\n" + str(tables_pod3[1]) + "\n" + str(tables_pod3[2]) + "\n" + str(tables_pod3[3]) + "\n")
 
 
 # fix ties
 @bot.command()
 async def gameover(ctx, pod, table, score):
-    score.split("-")
+    score = score.split("-")
+    table = int(table)
     if int(pod) == 1:
-        if int(score[0]) > int(score[2]):
-            bot.players_pod1_score[(int(table)*2)-2] = int(bot.players_pod1_score[(int(table)*2)-2]) + 3
-        if int(score[0]) < int(score[2]):
-            bot.players_pod1_score[(int(table)*2)-1] = int(bot.players_pod1_score[(int(table)*2)-1]) + 3
-        if int(score[0]) == int(score[2]):
-            bot.players_pod1_score[(int(table)*2)-2] = int(bot.players_pod1_score[(int(table)*2)-2]) + 1
-            bot.players_pod1_score[(int(table)*2)-1] = int(bot.players_pod1_score[(int(table)*2)-1]) + 1
+        if int(score[0]) > int(score[1]):
+            bot.players_pod1_score[table*2-2] += 3
+        elif int(score[0]) < int(score[1]):
+            bot.players_pod1_score[table*2-1] += 3
+        else:
+            bot.players_pod1_score[table*2-2] += 1
+            bot.players_pod1_score[table*2-1] += 1
     if int(pod) == 2:
-        if int(score[0]) > int(score[2]):
-            bot.players_pod2_score[(int(table)*2)-2] = int(bot.players_pod2_score[(int(table)*2)-2]) + 3
-        if int(score[0]) < int(score[2]):
-            bot.players_pod2_score[(int(table)*2)-1] = int(bot.players_pod2_score[(int(table)*2)-1]) + 3
-        if int(score[0]) == int(score[2]):
-            bot.players_pod2_score[(int(table)*2)-2] = int(bot.players_pod2_score[(int(table)*2)-2]) + 1
-            bot.players_pod2_score[(int(table)*2)-1] = int(bot.players_pod2_score[(int(table)*2)-1]) + 1
+        if int(score[0]) > int(score[1]):
+            bot.players_pod2_score[table*2-2] += 3
+        elif int(score[0]) < int(score[1]):
+            bot.players_pod2_score[table*2-1] += 3
+        else:
+            bot.players_pod2_score[table*2-2] += 1
+            bot.players_pod2_score[table*2-1] += 1
     if int(pod) == 3:
-        if int(score[0]) > int(score[2]):
-            bot.players_pod3_score[(int(table)*2)-2] = int(bot.players_pod3_score[(int(table)*2)-2]) + 3
-        if int(score[0]) < int(score[2]):
-            bot.players_pod3_score[(int(table)*2)-1] = int(bot.players_pod3_score[(int(table)*2)-1]) + 3
-        if int(score[0]) == int(score[2]):
-            bot.players_pod3_score[(int(table)*2)-2] = int(bot.players_pod3_score[(int(table)*2)-2]) + 1
-            bot.players_pod3_score[(int(table)*2)-1] = int(bot.players_pod3_score[(int(table)*2)-1]) + 1
+        if int(score[0]) > int(score[1]):
+            bot.players_pod3_score[(int(table)*2)-2] += 3
+        elif int(score[0]) < int(score[1]):
+            bot.players_pod3_score[(int(table)*2)-1] += 3
+        else:
+            bot.players_pod3_score[(int(table)*2)-2] += 1
+            bot.players_pod3_score[(int(table)*2)-1] += 1
+    score = []
 
 
 @bot.command()
+@commands.has_role('judge')
 async def results(ctx, pod=1):
     a = 0
     if int(pod) == 1:
@@ -118,21 +129,25 @@ async def results(ctx, pod=1):
             a += 1
         bot.playerspod1 = dict(sorted(bot.playerspod1.items(), key=operator.itemgetter(1), reverse=True))
         await ctx.send(bot.playerspod1)
+        bot.players_pod1_score= [0, 0, 0, 0, 0, 0, 0, 0]
     if int(pod) == 2:
         for player in bot.playerspod2:
             bot.playerspod2[player] += bot.players_pod2_score[a]
             a += 1
         bot.playerspod2 += dict(sorted(bot.playerspod2.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(bot.sorted_playerspod2)
+        await ctx.send(bot.playerspod2)
+        bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
     if int(pod) == 3:
         for player in bot.playerspod3:
             bot.playerspod3[player] += bot.players_pod3_score[a]
             a += 1
         bot.playerspod3 = dict(sorted(bot.playerspod3.items(), key=operator.itemgetter(1), reverse=True))
-        await ctx.send(bot.sorted_playerspod3)
+        await ctx.send(bot.playerspod3)
+        bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
 
 
 @bot.command()
+@commands.has_role('judge')
 async def endtourney(ctx):
     bot.player = []
     bot.players_pod1_score = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -149,6 +164,7 @@ async def endtourney(ctx):
 
 
 @bot.command()
+@commands.has_role('judge')
 async def generateleaderboard(ctx, pod):
     if int(pod) == 1:
         bot.leaderboardpod1 = "Leaderboard For Event\n-----------------------------\n"
@@ -167,6 +183,7 @@ async def generateleaderboard(ctx, pod):
         await ctx.send(bot.leaderboardpod3)
 
 @bot.command()
+@commands.has_role('judge')
 async def timer(ctx, type="start", time=3000):
     if type == 'start':
         await asyncio.sleep(time - 600)
@@ -177,13 +194,15 @@ async def timer(ctx, type="start", time=3000):
         await ctx.send("5 Rounds before Tie!")
 
 @bot.command()
-async def updateleaderboard(ctx, pod):
+@commands.has_role('judge')
+async def updateleaderboard(ctx):
     with open('leaderboard.json', 'r') as fp:
         oldleaderboard = json.load(fp)
         A = Counter(oldleaderboard)
-        B = Counter(bot.leaderboardpod1)
-        C = Counter(bot.leaderboardpod2)
-        D = Counter(bot.leaderboardpod3)
+        B = Counter(bot.playerspod1)
+        C = Counter(bot.playerspod2)
+        D = Counter(bot.playerspod3)
+
         newleaderboard = A + B + C + D
         leaderboarddisplay = "Leaderboard For Event\n-----------------------------\n"
         for key in newleaderboard:
